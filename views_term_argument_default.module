@@ -1,0 +1,48 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Views extensions for argument defaults for the current node's terms
+ */
+
+/**
+ * Implementation of hook_views_plugins().
+ */
+function views_term_argument_default_views_plugins() {
+  $base = array(
+    'handler'    => 'views_plugin_argument_default_views_term_argument_default',
+    'parent'     => 'fixed', // so that the parent class is included
+    'path'       => drupal_get_path('module', 'views_term_argument_default') . '/includes',
+  );
+
+  $defaults = array(
+    'views_term_argument_default' => array(
+      'title'      => t("All terms on current node"),
+    ) + $base,
+  );
+
+  //TODO: Instead of adding inf with argument defaults for each vocabulary - make it configurable through a form on the argument default itself?
+  $vocabularies = taxonomy_get_vocabularies();
+  foreach ($vocabularies as $vocabulary) {
+    $defaults['views_term_argument_default_vocab_' . $vocab] = array(
+      'title'      => t("Terms from '@vocabulary' on current node", array('@vocabulary' => $vocabulary->name)),
+      'vocabulary' => $vocabulary,
+    ) + $base;
+  }
+
+  return array('argument default' => $defaults);
+}
+
+function views_term_argument_default_node_get_terms($nid) {
+  static $terms;
+
+  if (!isset($terms[$nid])) {
+    $result = db_query(db_rewrite_sql('SELECT t.tid, t.vid FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {node} n ON r.vid = n.vid WHERE n.nid = %d', 't', 'tid'), $nid);
+    $terms[$nid] = array();
+    while ($term = db_fetch_object($result)) {
+      $terms[$nid][$term->tid] = $term;
+    }
+  }
+  return $terms[$nid];
+}
