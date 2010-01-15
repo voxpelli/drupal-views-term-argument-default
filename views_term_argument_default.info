@@ -1,0 +1,6 @@
+; $Id$
+name = Views Term Argument Default
+description = Expose a nodes term as argument defaults.
+package = Views
+core = 6.x
+version = "6.x-0.1"
