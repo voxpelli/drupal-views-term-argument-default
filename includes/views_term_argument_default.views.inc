@@ -25,7 +25,7 @@ function views_term_argument_default_views_plugins() {
   //TODO: Instead of adding inf with argument defaults for each vocabulary - make it configurable through a form on the argument default itself?
   $vocabularies = taxonomy_get_vocabularies();
   foreach ($vocabularies as $vocabulary) {
-    $defaults['views_term_argument_default_vocab_' . $vocab] = array(
+    $defaults['views_term_argument_default_vocab_' . $vocabulary->vid] = array(
       'title'      => t("Terms from '@vocabulary' on current node", array('@vocabulary' => $vocabulary->name)),
       'vocabulary' => $vocabulary,
     ) + $base;
